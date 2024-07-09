@@ -2,7 +2,8 @@ require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const { Midjourney } = require("midjourney");
-
+const initialImagine = require('./scripts/midjourney_api').initialImagine;  // Importing the initialImagine function
+const initialImaginewithUpscaling= require('./scripts/midjourney_api').initialImaginewithUpscaling;
 const app = express();
 const port = 3000; // You can change this to any port you prefer
 
@@ -37,6 +38,41 @@ app.post("/describe-image", async (req, res) => {
         return res.status(500).json({ message: "Internal server error" });
     }
 });
+
+// POST route to generate an image
+app.post("/generate-image", async (req, res) => {
+    try {
+        console.log(req.body)
+        const { imagePrompt }  = req.body;
+        console.log("Image Prompt: " + imagePrompt)
+        console.log(imagePrompt);
+        const msg = await initialImagine(imagePrompt);
+
+        res.status(200).json(msg);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+});
+
+// POST route to generate an image and upscale it
+app.post("/generate-image-upscale", async (req, res) => {
+    try {
+        console.log(req.body)
+        const { imagePrompt }  = req.body;
+        console.log("Image Prompt: " + imagePrompt)
+        console.log(imagePrompt);
+        const msg = await initialImaginewithUpscaling(imagePrompt);
+
+        res.status(200).json(msg);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+});
+
+
+
 
 app.get("/", async (req, res) => {
     return res.status(200).json({message: "OK" });
