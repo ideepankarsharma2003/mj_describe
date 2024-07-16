@@ -56,10 +56,6 @@ async function initialImagine(initial_prompt) {
 
 
 
-
-
-
-
 async function initialImaginewithUpscaling(initial_prompt) {
     prompt = `${initial_prompt} `;
     
@@ -72,10 +68,11 @@ async function initialImaginewithUpscaling(initial_prompt) {
         SessionId: process.env.SALAI_TOKEN || "8bb7f5b79c7a49f7d0824ab4b8773a81",
     });
     client.init();
-  
+
+    
     const msg = await new Promise((resolve) => {
         client.Imagine(prompt, (uri) => {
-        console.log("loading", uri);
+        console.log("IMAGINE |", uri);
         }).then((result) => {
         // client.Close();
         resolve(result);
@@ -83,7 +80,11 @@ async function initialImaginewithUpscaling(initial_prompt) {
     });
 
 
-    console.log(msg)
+    // console.log(msg)
+    if (!msg) {
+        console.log("no message");
+        return;
+      }
 
 
 
@@ -95,20 +96,73 @@ async function initialImaginewithUpscaling(initial_prompt) {
             flags: msg.flags,
             content: msg.content,
             loading: (uri, progress) => {
-              console.log("loading", uri, "progress", progress);
+              console.log("UPSCALE | ", uri, "progress", progress);
             },
           }).then((result) => {
-            client.Close();
             resolve(result);
-            });
-    })
+          });
+        })
+        
+        
+        
+        
+    content= msg.content
+    client.Close();
 
+
+    return msg1;
+    
+}
+
+async function initialImaginewithUpscalingv2(initial_prompt, client) {
+    prompt = `${initial_prompt} `;
     
 
 
+    
+    const msg = await new Promise((resolve) => {
+        client.Imagine(prompt, (uri) => {
+        console.log("IMAGINE |", uri);
+        }).then((result) => {
+        // client.Close();
+        resolve(result)
+        .catch((error)=>{
+          console.log("@@@@@@@@@@error",error)
+        })
+        });
+    });
+
+
+    // console.log(msg)
+    if (!msg) {
+        console.log("no message");
+        return;
+      }
+
+
+
+    const msg1= await new Promise((resolve)=>{
+        client.Upscale({
+            index: 2,
+            msgId: msg.id,
+            hash: msg.hash,
+            flags: msg.flags,
+            content: msg.content,
+            loading: (uri, progress) => {
+              console.log("UPSCALE | ", uri, "progress", progress);
+            },
+          }).then((result) => {
+            resolve(result);
+          })
+          .catch((e)=>{
+            console.log("?????????error",e);
+          })
+        })
+        
+        
+        
+        
     content= msg.content
-
-
     return msg1;
     
 }
@@ -163,7 +217,8 @@ async function initialImagine_with_cref(prompt, mj_links) {
 
 module.exports = {
     initialImagine,
-    initialImaginewithUpscaling
+    initialImaginewithUpscaling,
+    initialImaginewithUpscalingv2
 };
 
 
