@@ -126,9 +126,6 @@ async function initialImaginewithUpscalingv2(initial_prompt, client) {
         }).then((result) => {
         // client.Close();
         resolve(result)
-        .catch((error)=>{
-          console.log("@@@@@@@@@@error",error)
-        })
         });
     });
 
@@ -153,9 +150,6 @@ async function initialImaginewithUpscalingv2(initial_prompt, client) {
             },
           }).then((result) => {
             resolve(result);
-          })
-          .catch((e)=>{
-            console.log("?????????error",e);
           })
         })
         
